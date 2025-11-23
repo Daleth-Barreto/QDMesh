@@ -9,13 +9,13 @@ QDMesh es un framework en Wolfram Language para simulación y gestión de drones
 ### Desde GitHub
 
 ```wolfram
-PacletInstall["https://github.com/Daleth-Barreto/QDMesh/releases/download/2.0.0/QDMesh-2.0.0.paclet"]
+PacletInstall["https://github.com/Daleth-Barreto/QDMesh/archive/refs/heads/main.zip"];
 ````
 
 ### Desde Wolfram Cloud
 
 ```wolfram
-CloudInstall["https://github.com/Daleth-Barreto/QDMesh/releases/download/2.0.0/QDMesh-2.0.0.paclet"]
+CloudInstall["https://github.com/Daleth-Barreto/QDMesh/archive/refs/heads/main.zip"];
 ```
 
 ---
