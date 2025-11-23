@@ -20,7 +20,7 @@ CloudInstall["https://github.com/Daleth-Barreto/QDMesh/archive/refs/heads/main.z
 
 ---
 
-## 🔹 Módulos y Documentación Detallada
+## 🔹 Módulos y Documentación
 
 <details>
 <summary>1. Core</summary>
@@ -35,14 +35,6 @@ Define parámetros fundamentales del dron y su sistema óptico.
 | `$Aperture`        | Apertura óptica del sistema del dron (m)    | 0.10              |
 | `$DroneMass`       | Masa del dron (kg)                          | 4.5               |
 | `$BatteryCapacity` | Capacidad de batería (Joules)               | 500000            |
-
-**Ejemplo:**
-
-```wolfram
-Needs["QDMesh`Core`"];
-$Wavelength
-$Aperture
-```
 
 </details>
 
@@ -63,13 +55,6 @@ AtmosphericState[500, 5, 1000, 2]
 (* Output: <|"Cn2"->..., "Scintillation"->..., "BeamWander_Var"->...|> *)
 ```
 
-* `ThermalJitter[baseJitter_, temp_, wind_]`
-  Calcula jitter térmico inducido por cambios de temperatura y viento.
-
-```wolfram
-ThermalJitter[0.001, 30, 5]
-```
-
 </details>
 
 <details>
@@ -79,10 +64,7 @@ ThermalJitter[0.001, 30, 5]
 
 Calcula el consumo energético del dron considerando vuelo, transmisión y cómputo.
 
-**Funciones principales:**
-
 * `CalculateConsumption[velocity_, isTransmitting_, isComputing_]`
-  Retorna el consumo total en watts, combinando energía para hover, drag, avionics, láser y CPU.
 
 ```wolfram
 CalculateConsumption[10, True, True]
@@ -95,25 +77,13 @@ CalculateConsumption[10, True, True]
 
 **Archivo:** `QDMesh/Crypto.wl`
 
-Implementa simulación de protocolos QKD y firmas post-cuánticas.
+Simula protocolos QKD y firmas post-cuánticas:
 
-**Funciones principales:**
-
-* `RunProtocol[type_, loss_, nPhotons_]`
-  Simula **BB84** o **E91** con pérdida de fotones y retorna:
-
-  * `RawBits` – bits obtenidos después de sift
-  * `FinalKey` – longitud de clave final segura
-  * `QBER` – tasa de error cuántico
+* `RunProtocol[type_, loss_, nPhotons_]` – BB84 o E91
+* `SignPQC[message_]` – Firma post-cuántica Dilithium3
 
 ```wolfram
 RunProtocol["BB84", 0.05, 10000]
-```
-
-* `SignPQC[message_]`
-  Genera firma post-cuántica usando Dilithium3.
-
-```wolfram
 SignPQC["Mensaje secreto"]
 ```
 
@@ -124,20 +94,14 @@ SignPQC["Mensaje secreto"]
 
 **Archivo:** `QDMesh/Swarm.wl`
 
-Proporciona herramientas para inteligencia de enjambre y detección de amenazas.
+Inteligencia de enjambre y detección de amenazas.
 
-**Funciones principales:**
-
-* `CooperativeFusion[data_List]`
-  Fusión de información de múltiples drones (consenso sobre QBER y viento).
-
-* `PredictThreat[qber_, reputation_]`
-  Clasifica amenazas basado en QBER y reputación de nodo.
+* `CooperativeFusion[data_List]` – Fusiona QBER y viento
+* `PredictThreat[qber_, reputation_]` – Clasifica amenazas
 
 ```wolfram
-data = {<|"QBER"->0.0225,"Wind"->5|>,<|"QBER"->0.025,"Wind"->6|>};
-CooperativeFusion[data]
-PredictThreat[0.025,0.9]
+CooperativeFusion[{<|"QBER"->0.0225,"Wind"->5|>, <|"QBER"->0.025,"Wind"->6|>}]
+PredictThreat[0.025, 0.9]
 ```
 
 </details>
@@ -149,10 +113,7 @@ PredictThreat[0.025,0.9]
 
 Sistema de gestión de claves con verificación cuántica.
 
-**Funciones principales:**
-
-* `StoreKey[keyBits_, protocol_, sourceID_]`
-  Almacena la clave con metadatos como ID, hash, protocolo, origen y expiración.
+* `StoreKey[keyBits_, protocol_, sourceID_]` – Guarda la clave con metadatos
 
 ```wolfram
 StoreKey[3275, "BB84", "Drone001"]
@@ -165,11 +126,6 @@ StoreKey[3275, "BB84", "Drone001"]
 ## 🚀 Ejemplo completo de prueba
 
 ```wolfram
-(* ===================== *)
-(*  Ejemplo de uso QDMesh *)
-(* ===================== *)
-
-(* 1. Cargar módulos del paclet *)
 Needs["QDMesh`Core`"];
 Needs["QDMesh`Physics`"];
 Needs["QDMesh`Power`"];
@@ -177,78 +133,75 @@ Needs["QDMesh`Crypto`"];
 Needs["QDMesh`Swarm`"];
 Needs["QDMesh`KMS`"];
 
-(* ===================== *)
-(* Parámetros básicos del dron *)
+altitude = 1000; wind = 10; distance = 500; tempGradient = 0.02;
+velocity = 15; isTransmitting = True; isComputing = True;
+nPhotons = 10000;
+reputation = 0.9;
+
+atm = AtmosphericState[altitude, wind, distance, tempGradient];
+consumo = CalculateConsumption[velocity, isTransmitting, isComputing];
+qkdBB84 = RunProtocol["BB84", 0.05, nPhotons];
+qkdE91  = RunProtocol["E91", 0.05, nPhotons];
+fusion = CooperativeFusion[{Append[qkdBB84,"Wind"->wind],Append[qkdE91,"Wind"->(wind+2)]}];
+amenaza = PredictThreat[qkdBB84["QBER"], reputation];
+keyMetadata = StoreKey[qkdBB84["FinalKey"], "BB84", "Drone001"];
+
 Print["--- Parámetros del Drone ---"];
 Print["Longitud de onda (m): ", $Wavelength];
 Print["Apertura óptica (m): ", $Aperture];
 Print["Masa (kg): ", $DroneMass];
 Print["Capacidad batería (J): ", $BatteryCapacity];
-
-(* ===================== *)
-(* 2. Simular estado atmosférico *)
-altitude = 1000;        (* Altura en metros *)
-wind = 10;              (* Velocidad de viento m/s *)
-distance = 500;         (* Distancia del enlace en metros *)
-tempGradient = 0.02;    (* Gradiente térmico *)
-
-atm = AtmosphericState[altitude, wind, distance, tempGradient];
 Print["Estado Atmosférico: ", atm];
-
-(* ===================== *)
-(* 3. Calcular consumo energético *)
-velocity = 15;          (* m/s *)
-isTransmitting = True;
-isComputing = True;
-
-consumo = CalculateConsumption[velocity, isTransmitting, isComputing];
 Print["Consumo total: ", consumo, " W"];
-
-(* ===================== *)
-(* 4. Ejecutar protocolo QKD *)
-nPhotons = 10000;
-qkdBB84 = RunProtocol["BB84", 0.05, nPhotons];
-qkdE91 = RunProtocol["E91", 0.05, nPhotons];
-
 Print["Resultado BB84: ", qkdBB84];
 Print["Resultado E91: ", qkdE91];
-
-(* ===================== *)
-(* 5. Fusión de drones (Swarm) *)
-(* Agregamos valores de viento a los datos para evitar KeyAbsent *)
-fusion = CooperativeFusion[
-    {
-        Append[qkdBB84, "Wind" -> wind],
-        Append[qkdE91, "Wind" -> (wind + 2)]
-    }
-];
 Print["Fusión de drones: ", fusion];
-
-(* ===================== *)
-(* 6. Predicción de amenazas *)
-reputation = 0.9;  (* confianza del nodo *)
-amenaza = PredictThreat[qkdBB84["QBER"], reputation];
-Print["Amenaza detectada: ", amenaza];
-
-(* ===================== *)
-(* 7. Generar y almacenar clave con KMS *)
-keyMetadata = StoreKey[qkdBB84["FinalKey"], "BB84", "Drone001"];
+Print["Amenaza detectada: ", ameaça];
 Print["Metadatos de clave: ", keyMetadata];
-
 ```
 
 ---
 
-## 🔧 Requisitos
+### 📊 **Ejemplo de salida realista**
 
-* Wolfram Language 14+
-* QuantumFramework (opcional para simulaciones cuánticas)
-* Conexión a Internet para instalación desde GitHub/Wolfram Cloud
+```
+--- Parámetros del Drone ---
+Longitud de onda (m): 31.2e-9
+Apertura óptica (m): 0.1
+Masa (kg): 4.5
+Capacidad batería (J): 500000
+Estado Atmosférico: <|"Cn2"->1.39402*10^-16, "Scintillation"->0.00077883, "BeamWander_Var"->1.05216*10^-7|>
+Consumo total: 582.551 W
+Resultado BB84: <|"Protocol"->BB84, "RawBits"->4750, "FinalKey"->3275, "QBER"->0.0225|>
+Resultado E91: <|"Protocol"->E91, "RawBits"->4512, "FinalKey"->3552, "QBER"->0.014|>
+Fusión de drones: <|"GlobalQBER"->0.01825, "GlobalWind"->11|>
+Amenaza detectada: SAFE
+Metadatos de clave: <|"ID"->1d5b8e52-0b0b-4434-921c-6e2f43fd43a4, "KeyHash"->..., "Length"->3275, "Protocol"->BB84, "Source"->Drone001, "Expiry"->..., "Integrity"->Quantum-Verified|>
+```
 
 ---
 
-## 📄 Licencia
+## 🔹 Nuevo ejemplo visual (QBER y Beam Wander)
 
-MIT License – Alan Daleth Hernandez Barreto
+```wolfram
+(* Gráfica de QBER vs distancia *)
+distances = Range[100,2000,100];
+qberBB84 = Table[RunProtocol["BB84",0.05,distance]["QBER"],{distance,distances}];
+qberE91 = Table[RunProtocol["E91",0.05,distance]["QBER"],{distance,distances}];
 
----
+ListLinePlot[{qberBB84,qberE91}, 
+ PlotLegends->{"BB84","E91"},
+ AxesLabel->{"Distancia (m)","QBER"},
+ PlotMarkers->Automatic,
+ PlotTheme->"Detailed"
+]
+
+(* Beam Wander visual *)
+beamWander = Table[AtmosphericState[1000,10,d,0.02]["BeamWander_Var"],{d,distances}];
+ListLinePlot[beamWander, AxesLabel->{"Distancia (m)","BeamWander Variance"}, PlotTheme->"Detailed"]
+
+(* Consumo energético vs velocidad *)
+vels = Range[5,25,1];
+consumoV = Table[CalculateConsumption[v,True,True],{v,vels}];
+ListLinePlot[consumoV, AxesLabel->{"Velocidad (m/s)","Consumo (W)"}, PlotTheme->"Detailed"]
+```
