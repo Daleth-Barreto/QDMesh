@@ -1,6 +1,6 @@
 Paclet[
     Name -> "QDMesh",
-    Version -> "2.0.0",
+    Version -> "2.2.5",
     WolframVersion -> "13.0+",
     Description -> "Q-DMesh: Quantum-Driven Mesh Network & QKD Drone Framework",
     Creator -> "Alan Daleth Hernandez Barreto",
