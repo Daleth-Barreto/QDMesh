@@ -1,22 +1,26 @@
-(* --- QDMesh Power Module --- *)
+(* --- QDMesh Power High-Fidelity --- *)
 
 BeginPackage["QDMesh`Power`", {"QDMesh`Core`"}];
 
-CalculateConsumption::usage = "Consumo energético por vuelo y actividad computacional.";
+CalculateConsumption::usage =
+    "Potencia total (Watts) considerando hover, avance, arrastre, láser y CPU.";
 
 Begin["`Private`"];
 
-CalculateConsumption[velocity_, isTransmitting_, isComputing_] := Module[
-    {hoverPower, dragPower, avionics, laserPower, cpuPower},
+CalculateConsumption[velocity_, isTransmitting_, isComputing_, altitude_] := Module[
+    {rho, dragPower, hoverPower, liftPower, avionicsPower, laserPower, cpuPower},
 
-    hoverPower = ($DroneMass*9.8)^1.5/Sqrt[2*1.225*($Aperture*4)];
-    dragPower = 0.5*1.225*0.1*velocity^3;
+    rho = 1.225*Exp[-altitude/8500]; (* Densidad atmosférica según altitud *)
 
-    avionics = 20;
+    (* Hover y lift *)
+    liftPower = ($DroneMass*9.81)^(3/2)/Sqrt[2*rho*$CrossSection];
+    dragPower = 0.5*rho*$DragCoeff*$CrossSection*velocity^3;
+
+    avionicsPower = 20;
     laserPower = If[isTransmitting, 15, 0];
     cpuPower = If[isComputing, 45, 5];
 
-    hoverPower + dragPower + avionics + laserPower + cpuPower
+    liftPower + dragPower + avionicsPower + laserPower + cpuPower
 ];
 
 End[];
