@@ -1,0 +1,96 @@
+<|
+    "Files"
+    ->
+    {
+        <|
+            "File"
+            ->
+            File[
+                "QDMesh/Core.wl"
+            ]
+            ,
+            "Hash"
+            ->
+            "2370c668b6182c82d5a1e5b6b68a046cd927f0facf501b7f294f9063614bc9ea"
+                
+        |>
+        ,
+        <|
+            "File"
+            ->
+            File[
+                "QDMesh/Crypto.wl"
+            ]
+            ,
+            "Hash"
+            ->
+            "6c5d82ed25a5b8b24350a48350177f594e9536209d0fc7b6c28a08800bee2ebc"
+                
+        |>
+        ,
+        <|
+            "File"
+            ->
+            File[
+                "QDMesh/KMS.wl"
+            ]
+            ,
+            "Hash"
+            ->
+            "2c8516ad680d89a06df288123515dc58595946b83c2ed84f74c315b6ac60518b"
+                
+        |>
+        ,
+        <|
+            "File"
+            ->
+            File[
+                "QDMesh/Physics.wl"
+            ]
+            ,
+            "Hash"
+            ->
+            "7f23efe023c5985358049d1bf6407aabc8e31154a9d5595c7cc7781dd76a813b"
+                
+        |>
+        ,
+        <|
+            "File"
+            ->
+            File[
+                "QDMesh/Power.wl"
+            ]
+            ,
+            "Hash"
+            ->
+            "8d3b6e2ede5e630886f47a96754fe48ca51c14efb502397a4ae14140cb01b1a5"
+                
+        |>
+        ,
+        <|
+            "File"
+            ->
+            File[
+                "QDMesh/Swarm.wl"
+            ]
+            ,
+            "Hash"
+            ->
+            "150ba11a4eb813fe28be6203d9dcc48d71abc8c91dd57e9bce0cfdba8ad99a20"
+                
+        |>
+        ,
+        <|
+            "File"
+            ->
+            File[
+                "QDMesh/Tests/SampleTest.wl"
+            ]
+            ,
+            "Hash"
+            ->
+            "c5a16474f0c8dbc9541aebef6b77c40a192a3dc06831467c4f2b9e97f3f4fabd"
+                
+        |>
+    }
+|>
